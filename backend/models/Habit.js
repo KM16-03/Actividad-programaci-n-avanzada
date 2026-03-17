@@ -3,20 +3,28 @@ const mongoose = require("mongoose");
 const habitSchema = new mongoose.Schema({
   title: {
     type: String,
-    required: true,
+    required: true
   },
   description: {
     type: String,
-    required: true,
+    required: true
   },
   days: {
     type: Number,
-    default: 0,
+    default: 0
   },
-  createdAt: {
+  startDate: {
     type: Date,
-    default: Date.now,
+    default: Date.now
   },
+  lastDone: {
+    type: Date,
+    default: Date.now
+  },
+  lastUpdate: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 module.exports = mongoose.model("Habit", habitSchema);

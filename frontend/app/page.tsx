@@ -2,49 +2,61 @@
 
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchHabits } from "../features/habitSlice";
+import { fetchHabits, markDone } from "../features/habitSlice";
 
-export default function Home() {
+export default function Page() {
   const dispatch = useDispatch();
   const habits = useSelector((state: any) => state.habits.habits);
+  const status = useSelector((state: any) => state.habits.status);
+  const error = useSelector((state: any) => state.habits.error);
 
   useEffect(() => {
     dispatch(fetchHabits() as any);
   }, [dispatch]);
 
+  const handleDone = (id: string) => {
+    dispatch(markDone(id) as any);
+  };
+
+  const getProgress = (days: number) => {
+    return (days / 66) * 100;
+  };
+
   return (
-    <main className="min-h-screen bg-gray-100 p-6">
-      <div className="mx-auto max-w-3xl">
-        <h1 className="mb-6 text-3xl font-bold">Lista de hábitos</h1>
+    <main className="min-h-screen bg-white p-6">
+      <div className="mx-auto max-w-2xl">
+        <h1 className="mb-6 text-5xl font-bold text-black">Habits</h1>
+
+        {status === "loading" && (
+          <p className="mb-4 text-sm text-black">Loading...</p>
+        )}
+
+        {error && (
+          <p className="mb-4 text-sm text-black">{error}</p>
+        )}
 
         <div className="space-y-4">
-          {habits && habits.length > 0 ? (
-            habits.map((habit: any) => (
-              <div
-                key={habit._id}
-                className="rounded-lg bg-white p-4 shadow"
-              >
-                <h2 className="text-xl font-semibold">{habit.name}</h2>
-                <p className="mt-1 text-gray-600">{habit.description}</p>
-
-                <div className="mt-4">
-                  <p className="mb-2 text-sm font-medium">Progreso</p>
-                  <div className="h-4 w-full overflow-hidden rounded-full bg-gray-300">
-                    <div className="h-full w-1/3 bg-blue-600"></div>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  className="mt-4 rounded bg-blue-600 px-4 py-2 text-white"
-                >
-                  Done
-                </button>
+          {habits.map((habit: any) => (
+            <div key={habit._id} className="flex items-center gap-4">
+              <div className="w-32 text-base text-black">
+                {habit.title} {habit.days}
               </div>
-            ))
-          ) : (
-            <p>No hay hábitos disponibles.</p>
-          )}
+
+              <div className="h-4 flex-1 rounded bg-gray-400">
+                <div
+                  className="h-4 rounded bg-green-500"
+                  style={{ width: `${getProgress(habit.days)}%` }}
+                ></div>
+              </div>
+
+              <button
+                onClick={() => handleDone(habit._id)}
+                className="rounded bg-black px-6 py-3 text-white"
+              >
+                Hecho
+              </button>
+            </div>
+          ))}
         </div>
       </div>
     </main>
