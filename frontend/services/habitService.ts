@@ -4,7 +4,7 @@ export const getHabits = async () => {
   const response = await fetch(`${API_URL}/habits`);
 
   if (!response.ok) {
-    throw new Error("Failed to fetch habits");
+    throw new Error("Error al obtener hábitos");
   }
 
   return response.json();
@@ -13,12 +13,13 @@ export const getHabits = async () => {
 export const markHabitDone = async (id: string) => {
   const response = await fetch(`${API_URL}/habits/${id}/done`, {
     method: "PATCH",
-    credentials: "include",
   });
 
+  const data = await response.json();
+
   if (!response.ok) {
-    throw new Error("Failed to mark habit as done");
+    throw new Error(data.error || "Error al marcar hábito");
   }
 
-  return response.json();
+  return data;
 };

@@ -17,9 +17,10 @@ router.get("/habits", async function (req, res, next) {
     const habits = await Habit.find();
     res.status(200).json(habits);
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Error al obtener hábitos", description: error.toString() });
+    res.status(500).json({
+      error: "Error al obtener hábitos",
+      description: error.toString(),
+    });
   }
 });
 
@@ -30,15 +31,20 @@ router.post("/habits", async function (req, res, next) {
     const habit = new Habit({
       title,
       description,
+      days: 0,
+      startDate: new Date(),
+      lastDone: new Date(),
+      lastUpdate: new Date(),
     });
 
     await habit.save();
 
     res.status(201).json(habit);
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Error al crear hábito", description: error.toString() });
+    res.status(500).json({
+      error: "Error al crear hábito",
+      description: error.toString(),
+    });
   }
 });
 
@@ -54,9 +60,10 @@ router.patch("/habits/:id", async function (req, res, next) {
 
     res.status(200).json(updatedHabit);
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Error al actualizar hábito", description: error.toString() });
+    res.status(500).json({
+      error: "Error al actualizar hábito",
+      description: error.toString(),
+    });
   }
 });
 
@@ -65,9 +72,10 @@ router.delete("/habits/:id", async function (req, res, next) {
     await Habit.findByIdAndDelete(req.params.id);
     res.status(200).json({ message: "Hábito eliminado correctamente" });
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Error al eliminar hábito", description: error.toString() });
+    res.status(500).json({
+      error: "Error al eliminar hábito",
+      description: error.toString(),
+    });
   }
 });
 
@@ -79,15 +87,28 @@ router.patch("/habits/:id/done", async function (req, res, next) {
       return res.status(404).json({ error: "Hábito no encontrado" });
     }
 
-    const doneDate = new Date();
-    habit.lastDone = doneDate;
+    const now = new Date();
 
-    const hoursPassed = differenceInHours(doneDate, habit.lastUpdate);
+    if (!habit.startDate) {
+      habit.startDate = now;
+    }
+
+    if (!habit.lastUpdate) {
+      habit.lastUpdate = now;
+    }
+
+    if (!habit.lastDone) {
+      habit.lastDone = now;
+    }
+
+    const hoursPassed = differenceInHours(now, habit.lastUpdate);
+
+    habit.lastDone = now;
 
     if (hoursPassed > 24) {
-      habit.lastUpdate = doneDate;
-      habit.startDate = doneDate;
       habit.days = 0;
+      habit.startDate = now;
+      habit.lastUpdate = now;
 
       await habit.save();
 
@@ -95,21 +116,22 @@ router.patch("/habits/:id/done", async function (req, res, next) {
         message: "Habit restarted",
         habit,
       });
-    } else {
-      habit.lastUpdate = doneDate;
-      habit.days = differenceInDays(doneDate, habit.startDate);
-
-      await habit.save();
-
-      return res.status(200).json({
-        message: "Habit marked as done",
-        habit,
-      });
     }
+
+    habit.lastUpdate = now;
+    habit.days = differenceInDays(now, habit.startDate);
+
+    await habit.save();
+
+    return res.status(200).json({
+      message: "Habit marked as done",
+      habit,
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Error al marcar hábito", description: error.toString() });
+    res.status(500).json({
+      error: "Error al marcar hábito",
+      description: error.toString(),
+    });
   }
 });
 
