@@ -39,7 +39,6 @@ router.post('/login', async function(req, res, next) {
   try {
     const { username, password } = req.body;
 
-    // Buscar usuario
     const user = await User.findOne({ username });
     if (!user) {
       return res.status(400).json({
@@ -47,7 +46,6 @@ router.post('/login', async function(req, res, next) {
       });
     }
 
-    // Comparar contraseña
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({
@@ -55,18 +53,18 @@ router.post('/login', async function(req, res, next) {
       });
     }
 
-    // Crear token con userId
     const token = jwt.sign(
       { userId: user._id },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
 
-    // Guardar token en cookie
+    const isProduction = process.env.NODE_ENV === 'production';
+
     res.cookie('habitToken', token, {
-      httpOnly: false, // permite leer la cookie desde frontend
-      secure: false,   // en local déjalo false
-      sameSite: 'lax',
+      httpOnly: false,
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
