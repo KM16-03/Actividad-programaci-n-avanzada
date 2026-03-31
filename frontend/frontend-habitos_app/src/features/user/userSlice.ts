@@ -68,7 +68,7 @@ const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchRegisterUserThunk.rejected, (state, action) => {
+      .addCase(fetchRegisterUserThunk.rejected, () => {
         alert("No es posible registrar el usuario en este momento");
       })
       .addCase(fetchLoginUserThunk.rejected, (state, action) => {

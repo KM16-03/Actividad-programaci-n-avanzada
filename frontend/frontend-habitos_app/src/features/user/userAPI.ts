@@ -1,12 +1,14 @@
+const API_URL = import.meta.env.VITE_API_URL;
+
 export const fetchRegisterUser = async (username: string, password: string) => {
-  const response = await fetch("http://localhost:3001/users/register", {
+  const response = await fetch(`${API_URL}/users/register`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      "username": username,
-      "password": password
+      username: username,
+      password: password
     })
   });
 
@@ -18,15 +20,15 @@ export const fetchRegisterUser = async (username: string, password: string) => {
 };
 
 export const fetchLoginUser = async (username: string, password: string) => {
-  const response = await fetch("http://localhost:3000/users/login", {
+  const response = await fetch(`${API_URL}/users/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
     credentials: 'include',
     body: JSON.stringify({
-      "username": username,
-      "password": password
+      username: username,
+      password: password
     })
   });
 
