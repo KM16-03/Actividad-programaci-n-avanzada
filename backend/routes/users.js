@@ -11,7 +11,10 @@ router.get('/', function(req, res, next) {
 
 router.post('/register', async function(req, res, next) {
   try {
+    console.log('Entró a /users/register');
+
     const { username, password } = req.body;
+    console.log('Username recibido en register:', username);
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -22,12 +25,13 @@ router.post('/register', async function(req, res, next) {
     });
 
     await newUser.save();
+    console.log('Usuario guardado correctamente');
 
     res.status(201).json({
       message: 'Usuario registrado correctamente'
     });
   } catch (error) {
-    console.log(error);
+    console.log('Error en /users/register:', error);
     res.status(500).json({
       error: 'Error en el registro',
       description: error.toString()
@@ -37,7 +41,12 @@ router.post('/register', async function(req, res, next) {
 
 router.post('/login', async function(req, res, next) {
   try {
+    console.log('Entró a /users/login');
+
     const { username, password } = req.body;
+    console.log('Username recibido en login:', username);
+    console.log('JWT_SECRET existe:', !!process.env.JWT_SECRET);
+    console.log('NODE_ENV:', process.env.NODE_ENV);
 
     const user = await User.findOne({ username });
     if (!user) {
@@ -68,12 +77,14 @@ router.post('/login', async function(req, res, next) {
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
+    console.log('Login correcto');
+
     res.json({
       message: 'Inicio de sesión exitoso',
       token
     });
   } catch (error) {
-    console.log(error);
+    console.log('Error real en /users/login:', error);
     res.status(500).json({
       error: 'Error en el login',
       description: error.toString()
