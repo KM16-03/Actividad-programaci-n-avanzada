@@ -15,7 +15,7 @@ var app = express();
 
 app.use(cors({
   origin: isProduction
-    ? "https://actividad-programaci-n-avanzada-1.onrender.com/"
+    ? "https://actividad-programaci-n-avanzada-1.onrender.com"
     : "http://localhost:5173",
   credentials: true
 }));
